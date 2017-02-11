@@ -359,7 +359,7 @@ func TestMultiPortOnServiceUpdate(t *testing.T) {
 	waitForNumProxyLoops(t, p, 0)
 
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: serviceP.Name, Namespace: serviceP.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: serviceP.Name, Namespace: serviceP.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: "0.0.0.0", Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     0,
@@ -611,7 +611,7 @@ func TestTCPProxyUpdateDeleteUpdate(t *testing.T) {
 	// need to add endpoint here because it got clean up during service delete
 	lb.OnEndpointsUpdate([]api.Endpoints{endpoint})
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: listenIP, Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     int32(getPortNum(t, svcInfo.socket.Addr().String())),
@@ -666,7 +666,7 @@ func TestUDPProxyUpdateDeleteUpdate(t *testing.T) {
 	// need to add endpoint here because it got clean up during service delete
 	lb.OnEndpointsUpdate([]api.Endpoints{endpoint})
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: listenIP, Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     int32(getPortNum(t, svcInfo.socket.Addr().String())),
@@ -710,7 +710,7 @@ func TestTCPProxyUpdatePort(t *testing.T) {
 	waitForNumProxyLoops(t, p, 1)
 
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: listenIP, Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     0,
@@ -759,7 +759,7 @@ func TestUDPProxyUpdatePort(t *testing.T) {
 	waitForNumProxyLoops(t, p, 1)
 
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: listenIP, Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     0,
@@ -886,7 +886,7 @@ func TestProxyUpdatePortal(t *testing.T) {
 	}
 
 	p.OnServiceUpdate([]api.Service{{
-		ObjectMeta: metav1.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
+		ObjectMeta: api.ObjectMeta{Name: service.Name, Namespace: service.Namespace},
 		Spec: api.ServiceSpec{ClusterIP: listenIP, Ports: []api.ServicePort{{
 			Name:     "p",
 			Port:     int32(svcInfo.portal.port),

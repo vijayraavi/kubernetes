@@ -1,5 +1,5 @@
 /*
-Copyright 2017 The Kubernetes Authors.
+Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package winuserspace
+package ipconfig
 
 import (
-	"fmt"
+	"testing"
 
-	"k8s.io/kubernetes/pkg/types"
+	"k8s.io/kubernetes/pkg/util/exec"
 )
 
-// ServicePortPortalName carries a namespace + name + portname + portalip.  This is the unique
-// identifier for a windows service port portal.
-type ServicePortPortalName struct {
-	types.NamespacedName
-	Port         string
-	PortalIPName string
-}
+func TestGetDnsSuffixSearchList(t *testing.T) {
+	// Simple test
+	ipconfigInterface := New(exec.New())
 
-func (spn ServicePortPortalName) String() string {
-	return fmt.Sprintf("%s:%s:%s", spn.NamespacedName.String(), spn.Port, spn.PortalIPName)
+	_, err := ipconfigInterface.GetDnsSuffixSearchList()
+	if err != nil {
+		t.Errorf("expected success, got %v", err)
+	}
 }

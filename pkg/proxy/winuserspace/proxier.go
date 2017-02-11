@@ -26,13 +26,9 @@ import (
 
 	"github.com/golang/glog"
 
-	"k8s.io/apimachinery/pkg/types"
-	utilnet "k8s.io/apimachinery/pkg/util/net"
-	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/proxy"
 	"k8s.io/kubernetes/pkg/types"
-	utilerrors "k8s.io/kubernetes/pkg/util/errors"
 	utilnet "k8s.io/kubernetes/pkg/util/net"
 	"k8s.io/kubernetes/pkg/util/netsh"
 	"k8s.io/kubernetes/pkg/util/runtime"
@@ -54,6 +50,7 @@ type serviceInfo struct {
 	socket              proxySocket
 	timeout             time.Duration
 	activeClients       *clientCache
+	dnsClients          *dnsClientCache
 	sessionAffinityType api.ServiceAffinity
 }
 
@@ -264,6 +261,7 @@ func (proxier *Proxier) addServicePortPortal(servicePortPortalName ServicePortPo
 		socket:              sock,
 		timeout:             timeout,
 		activeClients:       newClientCache(),
+		dnsClients:          newDnsClientCache(),
 		sessionAffinityType: api.ServiceAffinityNone, // default
 	}
 	proxier.setServiceInfo(servicePortPortalName, si)
