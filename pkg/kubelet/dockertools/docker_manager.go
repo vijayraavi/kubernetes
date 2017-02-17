@@ -805,6 +805,11 @@ func (dm *DockerManager) runContainer(
 	}
 	dm.recorder.Eventf(ref, api.EventTypeNormal, events.CreatedContainer, createdEventMsg)
 
+	// Windows specific workaround to configure networking post container creation.
+	// Uncomment below once we have network namespace sharing is available
+	//if container.Name == PodInfraContainerName {
+	dm.configureInfraContainerNetworkConfig(createResp.ID)
+
 	if err = dm.client.StartContainer(createResp.ID); err != nil {
 		dm.recorder.Eventf(ref, api.EventTypeWarning, events.FailedToStartContainer,
 			"Failed to start container with docker id %v with error: %v", utilstrings.ShortenString(createResp.ID, 12), err)
@@ -812,6 +817,15 @@ func (dm *DockerManager) runContainer(
 	}
 	dm.recorder.Eventf(ref, api.EventTypeNormal, events.StartedContainer, "Started container with docker id %v", utilstrings.ShortenString(createResp.ID, 12))
 
+	// Windows specific workaround to configure networking post container creation.
+	dns := ""
+	if len(opts.DNS) > 0 {
+		dns = opts.DNS[0]
+	}
+
+	// Uncomment below once we have network namespace sharing is available
+	//if container.Name == PodInfraContainerName {
+	dm.FinalizeInfraContainerNetwork(kubecontainer.DockerID(createResp.ID).ContainerID(), dns)
 	return kubecontainer.DockerID(createResp.ID).ContainerID(), nil
 }
 

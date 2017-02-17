@@ -46,6 +46,16 @@ func containerProvidesPodIP(name *KubeletContainerName) bool {
 	return false
 }
 
+// Configure Infra Networking post Container Creation, before the container starts
+func (dm *DockerManager) configureInfraContainerNetworkConfig(containerID string) {
+	// Do nothing
+}
+
+// Configure Infra Networking post Container Creation, after the container starts
+func (dm *DockerManager) FinalizeInfraContainerNetwork(containerID kubecontainer.ContainerID, DNS string) {
+	// Do nothing
+}
+
 // Returns nil as both Seccomp and AppArmor security options are not valid on Windows
 func (dm *DockerManager) getSecurityOpts(pod *api.Pod, ctrName string) ([]dockerOpt, error) {
 	return nil, nil
