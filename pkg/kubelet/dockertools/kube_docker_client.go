@@ -79,7 +79,7 @@ const (
 	// Docker reports image progress for every 512kB block, so normally there shouldn't be too long interval
 	// between progress updates.
 	// TODO(random-liu): Make this configurable
-	defaultImagePullingStuckTimeout = 1 * time.Minute
+	defaultImagePullingStuckTimeout = 20 * time.Minute
 )
 
 // newKubeDockerClient creates an kubeDockerClient from an existing docker client. If requestTimeout is 0,
@@ -336,6 +336,8 @@ func (p *progressReporter) start() {
 					glog.Errorf("Cancel pulling image %q because of no progress for %v, latest progress: %q", p.image, defaultImagePullingStuckTimeout, progress)
 					p.cancel()
 					return
+				} else if time.Now().Sub(timestamp) > (1 * time.Minute) {
+					glog.Errorf("pulling image %q appears stuck because of no progress for %v, latest progress: %q", p.image, (1 * time.Minute), progress)
 				}
 				glog.V(2).Infof("Pulling image %q: %q", p.image, progress)
 			case <-p.stopCh:
