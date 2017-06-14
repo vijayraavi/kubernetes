@@ -52,3 +52,11 @@ func (ds *dockerService) determinePodIPBySandboxID(uid string) string {
 func (ds *dockerService) configureInfraContainerNetworkConfig(containerID string) {
 	// Do nothing
 }
+
+func getNetworkNamespace(c *dockertypes.ContainerJSON) (string, error) {
+	if c.State.Pid == 0 {
+		// Docker reports pid 0 for an exited container.
+		return "", fmt.Errorf("Cannot find network namespace for the terminated container %q", c.ID)
+	}
+	return fmt.Sprintf(dockerNetNSFmt, c.State.Pid), nil
+}
