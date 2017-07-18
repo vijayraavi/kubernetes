@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -99,6 +100,7 @@ import (
 	kubeio "k8s.io/kubernetes/pkg/util/io"
 	utilipt "k8s.io/kubernetes/pkg/util/iptables"
 	"k8s.io/kubernetes/pkg/util/mount"
+	utilnetsh "k8s.io/kubernetes/pkg/util/netsh"
 	nodeutil "k8s.io/kubernetes/pkg/util/node"
 	"k8s.io/kubernetes/pkg/util/oom"
 	"k8s.io/kubernetes/pkg/util/procfs"
@@ -1325,7 +1327,13 @@ func (kl *Kubelet) GetClusterDNS(pod *v1.Pod) ([]string, []string, bool, error) 
 		// local machine". A nameserver setting of localhost is equivalent to
 		// this documented behavior.
 		if kl.resolverConfig == "" {
-			hostDNS = []string{"127.0.0.1"}
+			if runtime.GOOS != "windows" {
+				hostDNS = []string{"127.0.0.1"}
+			} else {
+				execer := utilexec.New()
+				netshInterface := utilnetsh.New(execer)
+				hostDNS = netshInterface.GetDNSServers()
+			}
 			hostSearch = []string{"."}
 		} else {
 			hostSearch = kl.formDNSSearchForDNSDefault(hostSearch, pod)

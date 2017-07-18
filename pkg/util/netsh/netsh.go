@@ -46,6 +46,9 @@ type Interface interface {
 	// IP Address needs to be added for netsh portproxy to redirect traffic
 	// Reads Environment variable INTERFACE_TO_ADD_SERVICE_IP, if it is not defined then "vEthernet (HNSTransparent)" is returned
 	GetInterfaceToAddIP() string
+
+	// GetDNSServers returns the list of DNS servers for vEthernet (HNSTransparent) interface.
+	GetDNSServers() []string
 }
 
 const (
@@ -178,6 +181,37 @@ func (runner *runner) GetInterfaceToAddIP() string {
 // Restore is part of Interface.
 func (runner *runner) Restore(args []string) error {
 	return nil
+}
+
+// GetDNSServers returns the list of DNS servers for vEthernet (HNSTransparent) interface.
+func (runner *runner) GetDNSServers() []string {
+	dnsServersList := []string{}
+	intName := "vEthernet (HNSTransparent)"
+	argsDNSServers := []string{
+		"interface", "ipv4", "show", "dnsservers",
+		"name=" + intName,
+	}
+
+	dnsServers, err := runner.exec.Command(cmdNetsh, argsDNSServers...).CombinedOutput()
+	if err != nil {
+		glog.Errorf("Error getting DNS servers: %v", err)
+		return dnsServersList
+	}
+
+	dnsServersString := string(dnsServers[:])
+	glog.V(3).Infof("Getting DNS servers for %s: %v", intName, dnsServersString)
+	dnsServersArray := strings.Split(dnsServersString, "\n")
+	for _, line := range dnsServersArray {
+		if strings.Contains(line, "DNS servers") {
+			if parts := strings.Split(line, ":"); len(parts) > 1 {
+				if trimmed := strings.TrimSpace(parts[1]); trimmed != "" && trimmed != "None" {
+					dnsServersList = append(dnsServersList, trimmed)
+				}
+			}
+		}
+	}
+
+	return dnsServersList
 }
 
 // checkIPExists checks if an IP address exists in 'netsh interface ipv4 show address' output
