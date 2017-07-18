@@ -860,8 +860,9 @@ func (dm *DockerManager) runContainer(
 	dm.recorder.Eventf(ref, v1.EventTypeNormal, events.StartedContainer, "Started container with docker id %v", utilstrings.ShortenString(createResp.ID, 12))
 
 	// Windows specific workaround to configure networking post container creation.
+	useClusterFirstPolicy := ((pod.Spec.DNSPolicy == v1.DNSClusterFirst && !kubecontainer.IsHostNetworkPod(pod)) || pod.Spec.DNSPolicy == v1.DNSClusterFirstWithHostNet)
 	dns := ""
-	if len(opts.DNS) > 0 {
+	if useClusterFirstPolicy && len(opts.DNS) > 0 {
 		dns = opts.DNS[0]
 	}
 
