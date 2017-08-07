@@ -848,9 +848,9 @@ func (dm *DockerManager) runContainer(
 	dm.recorder.Eventf(ref, v1.EventTypeNormal, events.CreatedContainer, createdEventMsg)
 
 	// Windows specific workaround to configure networking post container creation.
-	// Uncomment below once we have network namespace sharing is available
-	//if container.Name == PodInfraContainerName {
-	dm.configureInfraContainerNetworkConfig(createResp.ID)
+	if container.Name != PodInfraContainerName {
+		dm.configureInfraContainerNetworkConfig(createResp.ID)
+	}
 
 	if err = dm.client.StartContainer(createResp.ID); err != nil {
 		dm.recorder.Eventf(ref, v1.EventTypeWarning, events.FailedToStartContainer,
@@ -866,9 +866,9 @@ func (dm *DockerManager) runContainer(
 		dns = opts.DNS[0]
 	}
 
-	// Uncomment below once we have network namespace sharing is available
-	//if container.Name == PodInfraContainerName {
-	dm.FinalizeInfraContainerNetwork(kubecontainer.DockerID(createResp.ID).ContainerID(), dns)
+	if container.Name != PodInfraContainerName {
+		dm.FinalizeInfraContainerNetwork(kubecontainer.DockerID(createResp.ID).ContainerID(), dns)
+	}
 	return kubecontainer.DockerID(createResp.ID).ContainerID(), nil
 }
 
