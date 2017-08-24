@@ -32,6 +32,7 @@ import (
 	dockerstdcopy "github.com/docker/docker/pkg/stdcopy"
 	dockerapi "github.com/docker/engine-api/client"
 	dockertypes "github.com/docker/engine-api/types"
+	dockernetworktypes "github.com/docker/engine-api/types/network"
 	"golang.org/x/net/context"
 )
 
@@ -78,7 +79,7 @@ const (
 	// Docker reports image progress for every 512kB block, so normally there shouldn't be too long interval
 	// between progress updates.
 	// TODO(random-liu): Make this configurable
-	defaultImagePullingStuckTimeout = 1 * time.Minute
+	defaultImagePullingStuckTimeout = 20 * time.Minute
 )
 
 // newKubeDockerClient creates an kubeDockerClient from an existing docker client. If requestTimeout is 0,
@@ -176,6 +177,17 @@ func (d *kubeDockerClient) RemoveContainer(id string, opts dockertypes.Container
 	ctx, cancel := d.getTimeoutContext()
 	defer cancel()
 	err := d.client.ContainerRemove(ctx, id, opts)
+	if ctxErr := contextError(ctx); ctxErr != nil {
+		return ctxErr
+	}
+	return err
+}
+
+func (d *kubeDockerClient) ConnectNetwork(id string, containerID string, config *dockernetworktypes.EndpointSettings) error {
+
+	ctx, cancel := d.getTimeoutContext()
+	defer cancel()
+	err := d.client.NetworkConnect(ctx, id, containerID, config)
 	if ctxErr := contextError(ctx); ctxErr != nil {
 		return ctxErr
 	}
@@ -324,6 +336,8 @@ func (p *progressReporter) start() {
 					glog.Errorf("Cancel pulling image %q because of no progress for %v, latest progress: %q", p.image, defaultImagePullingStuckTimeout, progress)
 					p.cancel()
 					return
+				} else if time.Now().Sub(timestamp) > (1 * time.Minute) {
+					glog.Errorf("pulling image %q appears stuck because of no progress for %v, latest progress: %q", p.image, (1 * time.Minute), progress)
 				}
 				glog.V(2).Infof("Pulling image %q: %q", p.image, progress)
 			case <-p.stopCh:

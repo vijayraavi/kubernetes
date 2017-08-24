@@ -425,12 +425,14 @@ func (kl *Kubelet) setNodeAddress(node *api.Node) error {
 		} else if addr := net.ParseIP(kl.hostname); addr != nil {
 			ipAddr = addr
 		} else {
-			var addrs []net.IP
-			addrs, err = net.LookupIP(node.Name)
-			for _, addr := range addrs {
-				if !addr.IsLoopback() && addr.To4() != nil {
-					ipAddr = addr
-					break
+			if goRuntime.GOOS != "windows" {
+				var addrs []net.IP
+				addrs, err = net.LookupIP(node.Name)
+				for _, addr := range addrs {
+					if !addr.IsLoopback() && addr.To4() != nil {
+						ipAddr = addr
+						break
+					}
 				}
 			}
 

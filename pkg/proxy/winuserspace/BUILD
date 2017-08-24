@@ -14,10 +14,10 @@ go_library(
     name = "go_default_library",
     srcs = [
         "loadbalancer.go",
-        "port_allocator.go",
         "proxier.go",
         "proxysocket.go",
         "roundrobin.go",
+        "types.go",
         "udp_server.go",
     ],
     tags = ["automanaged"],
@@ -26,6 +26,8 @@ go_library(
         "//pkg/proxy:go_default_library",
         "//pkg/types:go_default_library",
         "//pkg/util/errors:go_default_library",
+        "//pkg/util/exec:go_default_library",
+        "//pkg/util/ipconfig:go_default_library",
         "//pkg/util/net:go_default_library",
         "//pkg/util/netsh:go_default_library",
         "//pkg/util/runtime:go_default_library",
@@ -38,7 +40,6 @@ go_library(
 go_test(
     name = "go_default_test",
     srcs = [
-        "port_allocator_test.go",
         "proxier_test.go",
         "roundrobin_test.go",
     ],
@@ -50,6 +51,8 @@ go_test(
         "//pkg/types:go_default_library",
         "//pkg/util/net:go_default_library",
         "//pkg/util/netsh/testing:go_default_library",
-        "//pkg/util/runtime:go_default_library",
+        "//vendor:k8s.io/apimachinery/pkg/apis/meta/v1",
+        "//vendor:k8s.io/apimachinery/pkg/types",
+        "//vendor:k8s.io/apimachinery/pkg/util/runtime",
     ],
 )
