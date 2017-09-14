@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 // Subnet is assoicated with a network and represents a list

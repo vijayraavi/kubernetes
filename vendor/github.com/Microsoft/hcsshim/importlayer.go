@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/Microsoft/go-winio"
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 // ImportLayer will take the contents of the folder at importFolderPath and import
