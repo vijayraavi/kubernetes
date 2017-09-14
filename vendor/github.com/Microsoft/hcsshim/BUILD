@@ -43,7 +43,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//vendor/github.com/Microsoft/go-winio:go_default_library",
-        "//vendor/github.com/sirupsen/logrus:go_default_library",
+        "//vendor/github.com/Sirupsen/logrus:go_default_library",
         "//vendor/golang.org/x/sys/windows:go_default_library",
     ],
 )
