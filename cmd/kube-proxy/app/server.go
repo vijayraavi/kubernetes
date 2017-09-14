@@ -60,8 +60,6 @@ import (
 
 	"k8s.io/kubernetes/pkg/util"
 	"k8s.io/kubernetes/pkg/util/configz"
-	utildbus "k8s.io/kubernetes/pkg/util/dbus"
-	"k8s.io/kubernetes/pkg/util/exec"
 	utiliptables "k8s.io/kubernetes/pkg/util/iptables"
 	nodeutil "k8s.io/kubernetes/pkg/util/node"
 	"k8s.io/kubernetes/pkg/util/oom"

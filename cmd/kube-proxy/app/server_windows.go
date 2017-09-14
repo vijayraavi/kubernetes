@@ -26,7 +26,7 @@ import (
 	"net"
 	_ "net/http/pprof"
 
-	"k8s.io/api/core/v1"
+	clientv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
@@ -40,7 +40,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/configz"
 	utilnetsh "k8s.io/kubernetes/pkg/util/netsh"
 	utilnode "k8s.io/kubernetes/pkg/util/node"
-	"k8s.io/utils/exec"
+	"k8s.io/kubernetes/pkg/util/exec"
 
 	"github.com/golang/glog"
 )
@@ -70,9 +70,9 @@ func NewProxyServer(config *componentconfig.KubeProxyConfiguration, cleanupAndEx
 	// Create event recorder
 	hostname := utilnode.GetHostname(config.HostnameOverride)
 	eventBroadcaster := record.NewBroadcaster()
-	recorder := eventBroadcaster.NewRecorder(scheme, v1.EventSource{Component: "kube-proxy", Host: hostname})
+	recorder := eventBroadcaster.NewRecorder(scheme, clientv1.EventSource{Component: "kube-proxy", Host: hostname})
 
-	nodeRef := &v1.ObjectReference{
+	nodeRef := &clientv1.ObjectReference{
 		Kind:      "Node",
 		Name:      hostname,
 		UID:       types.UID(hostname),
@@ -82,7 +82,7 @@ func NewProxyServer(config *componentconfig.KubeProxyConfiguration, cleanupAndEx
 	var healthzServer *healthcheck.HealthzServer
 	var healthzUpdater healthcheck.HealthzUpdater
 	if len(config.HealthzBindAddress) > 0 {
-		healthzServer = healthcheck.NewDefaultHealthzServer(config.HealthzBindAddress, 2*config.IPTables.SyncPeriod.Duration, recorder, nodeRef)
+		healthzServer = healthcheck.NewDefaultHealthzServer(config.HealthzBindAddress, 2*config.IPTables.SyncPeriod.Duration)
 		healthzUpdater = healthzServer
 	}
 
