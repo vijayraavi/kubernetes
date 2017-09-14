@@ -64,13 +64,12 @@ go_library(
         "//vendor/k8s.io/client-go/tools/clientcmd:go_default_library",
         "//vendor/k8s.io/client-go/tools/clientcmd/api:go_default_library",
         "//vendor/k8s.io/client-go/tools/record:go_default_library",
-        "//vendor/k8s.io/utils/exec:go_default_library",
     ] + select({
         "@io_bazel_rules_go//go/platform:linux_amd64": [
-            "//pkg/features:go_default_library",
             "//pkg/util/dbus:go_default_library",
             "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
             "//vendor/k8s.io/apimachinery/pkg/util/net:go_default_library",
+            "//vendor/k8s.io/utils/exec:go_default_library",
         ],
         "@io_bazel_rules_go//go/platform:windows_amd64": [
             "//pkg/proxy/winkernel:go_default_library",
@@ -78,6 +77,7 @@ go_library(
             "//pkg/util/netsh:go_default_library",
             "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
             "//vendor/k8s.io/apimachinery/pkg/util/net:go_default_library",
+            "//vendor/k8s.io/utils/exec:go_default_library",
         ],
         "//conditions:default": [],
     }),
