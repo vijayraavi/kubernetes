@@ -3,7 +3,7 @@ package hcsshim
 import (
 	"encoding/json"
 
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 // RoutePolicy is a structure defining schema for Route based Policy
