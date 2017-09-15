@@ -19,6 +19,7 @@ package azure_dd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/golang/glog"
 	"k8s.io/kubernetes/pkg/api/v1"
@@ -98,9 +99,12 @@ func (m *azureDiskMounter) SetUpAt(dir string, fsGroup *int64) error {
 		mountPoint = true
 	}
 
-	if err := os.MkdirAll(dir, 0750); err != nil {
-		glog.Infof("azureDisk - mkdir failed on disk %s on dir: %s (%v)", diskName, dir, err)
-		return err
+	if runtime.GOOS != "windows" {
+		// in windows, we will use mklink to mount, will MkdirAll in Mount func
+		if err := os.MkdirAll(dir, 0750); err != nil {
+			glog.Errorf("azureDisk - mkdir failed on disk %s on dir: %s (%v)", diskName, dir, err)
+			return err
+		}
 	}
 
 	options := []string{"bind"}
