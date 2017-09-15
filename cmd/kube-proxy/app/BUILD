@@ -13,15 +13,8 @@ go_library(
     srcs = [
         "conntrack.go",
         "server.go",
-    ] + select({
-        "@io_bazel_rules_go//go/platform:linux_amd64": [
-            "server_linux.go",
-        ],
-        "@io_bazel_rules_go//go/platform:windows_amd64": [
-            "server_windows.go",
-        ],
-        "//conditions:default": [],
-    }),
+        "server_others.go",
+    ],
     tags = ["automanaged"],
     deps = [
         "//pkg/api:go_default_library",
@@ -39,6 +32,8 @@ go_library(
         "//pkg/proxy/userspace:go_default_library",
         "//pkg/util:go_default_library",
         "//pkg/util/configz:go_default_library",
+        "//pkg/util/dbus:go_default_library",
+        "//pkg/util/exec:go_default_library",
         "//pkg/util/iptables:go_default_library",
         "//pkg/util/mount:go_default_library",
         "//pkg/util/node:go_default_library",
@@ -54,6 +49,8 @@ go_library(
         "//vendor/k8s.io/apimachinery/pkg/runtime:go_default_library",
         "//vendor/k8s.io/apimachinery/pkg/runtime/serializer:go_default_library",
         "//vendor/k8s.io/apimachinery/pkg/runtime/serializer/json:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/util/net:go_default_library",
         "//vendor/k8s.io/apimachinery/pkg/util/runtime:go_default_library",
         "//vendor/k8s.io/apimachinery/pkg/util/wait:go_default_library",
         "//vendor/k8s.io/apiserver/pkg/server/healthz:go_default_library",
@@ -64,23 +61,7 @@ go_library(
         "//vendor/k8s.io/client-go/tools/clientcmd:go_default_library",
         "//vendor/k8s.io/client-go/tools/clientcmd/api:go_default_library",
         "//vendor/k8s.io/client-go/tools/record:go_default_library",
-    ] + select({
-        "@io_bazel_rules_go//go/platform:linux_amd64": [
-            "//pkg/util/dbus:go_default_library",
-            "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
-            "//vendor/k8s.io/apimachinery/pkg/util/net:go_default_library",
-            "//vendor/k8s.io/utils/exec:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:windows_amd64": [
-            "//pkg/proxy/winkernel:go_default_library",
-            "//pkg/proxy/winuserspace:go_default_library",
-            "//pkg/util/netsh:go_default_library",
-            "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
-            "//vendor/k8s.io/apimachinery/pkg/util/net:go_default_library",
-            "//vendor/k8s.io/utils/exec:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 go_test(
