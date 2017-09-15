@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "cgo_genrule", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -60,4 +60,16 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
+)
+
+cgo_genrule(
+    name = "cgo_codegen",
+    srcs = ["cgo.go"],
+    clinkopts = [
+        "-lz",
+        "-lm",
+        "-lpthread",
+        "-ldl",
+    ],
+    tags = ["automanaged"],
 )
