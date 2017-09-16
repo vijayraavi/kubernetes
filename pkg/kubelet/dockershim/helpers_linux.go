@@ -87,11 +87,6 @@ func (ds *dockerService) determinePodIPBySandboxID(uid string) string {
 	return ""
 }
 
-// Configure Infra Networking post Container Creation, before the container starts
-func (ds *dockerService) configureInfraContainerNetworkConfig(containerID string) {
-	// Do nothing
-}
-
 func getNetworkNamespace(c *dockertypes.ContainerJSON) (string, error) {
 	if c.State.Pid == 0 {
 		// Docker reports pid 0 for an exited container.
