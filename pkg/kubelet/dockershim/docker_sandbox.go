@@ -119,9 +119,6 @@ func (ds *dockerService) RunPodSandbox(config *runtimeapi.PodSandboxConfig) (id 
 		return createResp.ID, err
 	}
 
-	// Windows specific workaround to configure networking post container creation.
-	ds.configureInfraContainerNetworkConfig(createResp.ID)
-
 	// Step 4: Start the sandbox container.
 	// Assume kubelet's garbage collector would remove the sandbox later, if
 	// startContainer failed.
@@ -167,7 +164,6 @@ func (ds *dockerService) RunPodSandbox(config *runtimeapi.PodSandboxConfig) (id 
 			glog.Warningf("Failed to stop sandbox container %q for pod %q: %v", createResp.ID, config.Metadata.Name, err)
 		}
 	}
-
 	return createResp.ID, err
 }
 
