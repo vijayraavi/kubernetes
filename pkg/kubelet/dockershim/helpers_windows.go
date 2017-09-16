@@ -108,33 +108,17 @@ func (ds *dockerService) determinePodIPBySandboxID(sandboxID string) string {
 	return ""
 }
 
-// Configure Infra Networking post Container Creation, before the container starts
-func (ds *dockerService) configureInfraContainerNetworkConfig(containerID string) {
-	// Attach a second Nat network endpoint to the container to allow outbound internet traffic
-	netMode := os.Getenv("NAT_NETWORK")
-	if netMode == "" {
-		netMode = "nat"
-	}
-	ds.client.ConnectNetwork(netMode, containerID, nil)
-}
-
 func getNetworkNamespace(c *dockertypes.ContainerJSON) (string, error) {
 	return string(c.HostConfig.NetworkMode), nil
 }
 
 func getContainerIP(container *dockertypes.ContainerJSON) string {
-	ipFound := ""
-	containerNetworkName := os.Getenv("CONTAINER_NETWORK")
 	if container.NetworkSettings != nil {
-		for name, network := range container.NetworkSettings.Networks {
+		for _, network := range container.NetworkSettings.Networks {
 			if network.IPAddress != "" {
-				ipFound = network.IPAddress
-				if name == containerNetworkName {
-					return network.IPAddress
-				}
+				return network.IPAddress
 			}
 		}
 	}
-
-	return ipFound
+	return ""
 }
