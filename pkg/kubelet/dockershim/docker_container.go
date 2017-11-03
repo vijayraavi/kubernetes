@@ -151,6 +151,7 @@ func (ds *dockerService) CreateContainer(podSandboxID string, config *runtimeapi
 	hc.Resources.Devices = devices
 
 	hc.Isolation = "hyperv"
+	hc.Resources.Memory = 512 * 1024 * 1024
 
 	securityOpts, err := ds.getSecurityOpts(config.Metadata.Name, sandboxConfig, securityOptSep)
 	if err != nil {

@@ -577,6 +577,7 @@ func (ds *dockerService) makeSandboxDockerConfig(c *runtimeapi.PodSandboxConfig,
 	setSandboxResources(hc)
 
 	hc.Isolation = "hyperv"
+	hc.Resources.Memory = 512 * 1024 * 1024
 
 	// Apply cgroupsParent derived from the sandbox config.
 	if lc := c.GetLinux(); lc != nil {
