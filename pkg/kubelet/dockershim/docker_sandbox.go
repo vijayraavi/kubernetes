@@ -576,6 +576,8 @@ func (ds *dockerService) makeSandboxDockerConfig(c *runtimeapi.PodSandboxConfig,
 	// Apply resource options.
 	setSandboxResources(hc)
 
+	hc.Isolation = "hyperv"
+
 	// Apply cgroupsParent derived from the sandbox config.
 	if lc := c.GetLinux(); lc != nil {
 		// Apply Cgroup options.

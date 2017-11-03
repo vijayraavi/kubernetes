@@ -150,6 +150,8 @@ func (ds *dockerService) CreateContainer(podSandboxID string, config *runtimeapi
 	}
 	hc.Resources.Devices = devices
 
+	hc.Isolation = "hyperv"
+
 	securityOpts, err := ds.getSecurityOpts(config.Metadata.Name, sandboxConfig, securityOptSep)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate security options for container %q: %v", config.Metadata.Name, err)
