@@ -577,6 +577,8 @@ func (ds *dockerService) makeSandboxDockerConfig(c *runtimeapi.PodSandboxConfig,
 	// Apply resource options.
 	setSandboxResources(hc)
 
+	hc.Resources.Memory = 64 * 1024 * 1024
+
 	// Apply cgroupsParent derived from the sandbox config.
 	if lc := c.GetLinux(); lc != nil {
 		// Apply Cgroup options.

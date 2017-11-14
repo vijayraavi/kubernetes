@@ -48,7 +48,7 @@ func (ds *dockerService) updateCreateConfig(
 	if networkMode := os.Getenv("CONTAINER_NETWORK"); networkMode != "" {
 		createConfig.HostConfig.NetworkMode = dockercontainer.NetworkMode(networkMode)
 	} else {
-		modifyHostNetworkOptionForContainer(false, podSandboxID, createConfig.HostConfig)
+		createConfig.HostConfig.NetworkMode = dockercontainer.NetworkMode("none")
 	}
 
 	return nil
