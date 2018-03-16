@@ -99,10 +99,7 @@ func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandb
 		restartCount = containerStatus.RestartCount + 1
 	}
 
-	containerConfig, cleanupAction, err := m.generateContainerConfig(container, pod, restartCount, podIP, imageRef)
-	if cleanupAction != nil {
-		defer cleanupAction()
-	}
+	containerConfig, err := m.generateContainerConfig(container, pod, restartCount, podIP, imageRef)
 	if err != nil {
 		m.recordContainerEvent(pod, container, "", v1.EventTypeWarning, events.FailedToCreateContainer, "Error: %v", grpc.ErrorDesc(err))
 		return "Generate Container Config Failed", err
@@ -160,20 +157,20 @@ func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandb
 }
 
 // generateContainerConfig generates container config for kubelet runtime v1.
-func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Container, pod *v1.Pod, restartCount int, podIP, imageRef string) (*runtimeapi.ContainerConfig, func(), error) {
-	opts, _, cleanupAction, err := m.runtimeHelper.GenerateRunContainerOptions(pod, container, podIP)
+func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Container, pod *v1.Pod, restartCount int, podIP, imageRef string) (*runtimeapi.ContainerConfig, error) {
+	opts, _, err := m.runtimeHelper.GenerateRunContainerOptions(pod, container, podIP)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	uid, username, err := m.getImageUser(container.Image)
 	if err != nil {
-		return nil, cleanupAction, err
+		return nil, err
 	}
 
 	// Verify RunAsNonRoot. Non-root verification only supports numeric user.
 	if err := verifyRunAsNonRoot(pod, container, uid, username); err != nil {
-		return nil, cleanupAction, err
+		return nil, err
 	}
 
 	command, args := kubecontainer.ExpandContainerCommandAndArgs(container, opts.Envs)
@@ -210,7 +207,7 @@ func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Contai
 	}
 	config.Envs = envs
 
-	return config, cleanupAction, nil
+	return config, nil
 }
 
 // generateLinuxContainerConfig generates linux container config for kubelet runtime v1.
