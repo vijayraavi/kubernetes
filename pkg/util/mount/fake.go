@@ -17,7 +17,6 @@ limitations under the License.
 package mount
 
 import (
-	"os"
 	"path/filepath"
 	"sync"
 
@@ -174,16 +173,5 @@ func (f *FakeMounter) GetDeviceNameFromMount(mountPath, pluginDir string) (strin
 }
 
 func (f *FakeMounter) MakeRShared(path string) error {
-	return nil
-}
-
-func (f *FakeMounter) PrepareSafeSubpath(subPath Subpath) (newHostPath string, cleanupAction func(), err error) {
-	return subPath.Path, nil, nil
-}
-
-func (f *FakeMounter) CleanSubPaths(podDir string, volumeName string) error {
-	return nil
-}
-func (mounter *FakeMounter) SafeMakeDir(pathname string, base string, perm os.FileMode) error {
 	return nil
 }
