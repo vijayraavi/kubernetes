@@ -55,13 +55,14 @@ func (d *azureDiskDeleter) Delete() error {
 		return err
 	}
 
+	wasStandAlone := (*volumeSource.Kind != v1.AzureSharedBlobDisk)
 	managed := (*volumeSource.Kind == v1.AzureManagedDisk)
 
 	if managed {
 		return diskController.DeleteManagedDisk(volumeSource.DataDiskURI)
 	}
 
-	return diskController.DeleteBlobDisk(volumeSource.DataDiskURI)
+	return diskController.DeleteBlobDisk(volumeSource.DataDiskURI, wasStandAlone)
 }
 
 func (p *azureDiskProvisioner) Provision() (*v1.PersistentVolume, error) {
@@ -148,13 +149,26 @@ func (p *azureDiskProvisioner) Provision() (*v1.PersistentVolume, error) {
 			return nil, err
 		}
 	} else {
+		forceStandAlone := (kind == v1.AzureDedicatedBlobDisk)
 		if kind == v1.AzureDedicatedBlobDisk {
-			_, diskURI, _, err = diskController.CreateVolume(name, account, skuName, location, requestGB)
-			if err != nil {
-				return nil, err
+			if location != "" && account != "" {
+				// use dedicated kind (by default) for compatibility
+				_, diskURI, _, err = diskController.CreateVolume(name, account, skuName, location, requestGB)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				if location != "" || account != "" {
+					return nil, fmt.Errorf("AzureDisk - location(%s) and account(%s) must be both empty or specified for dedicated kind, only one value specified is not allowed",
+						location, account)
+				}
+				diskURI, err = diskController.CreateBlobDisk(name, skuName, requestGB, forceStandAlone)
+				if err != nil {
+					return nil, err
+				}
 			}
 		} else {
-			diskURI, err = diskController.CreateBlobDisk(name, skuName, requestGB)
+			diskURI, err = diskController.CreateBlobDisk(name, skuName, requestGB, forceStandAlone)
 			if err != nil {
 				return nil, err
 			}
