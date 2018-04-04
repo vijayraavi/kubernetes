@@ -252,10 +252,7 @@ func (vm *volumeManager) Run(sourcesReady config.SourcesReady, stopCh <-chan str
 func (vm *volumeManager) GetMountedVolumesForPod(podName types.UniquePodName) container.VolumeMap {
 	podVolumes := make(container.VolumeMap)
 	for _, mountedVolume := range vm.actualStateOfWorld.GetMountedVolumesForPod(podName) {
-		podVolumes[mountedVolume.OuterVolumeSpecName] = container.VolumeInfo{
-			Mounter:             mountedVolume.Mounter,
-			InnerVolumeSpecName: mountedVolume.InnerVolumeSpecName,
-		}
+		podVolumes[mountedVolume.OuterVolumeSpecName] = container.VolumeInfo{Mounter: mountedVolume.Mounter}
 	}
 	return podVolumes
 }
