@@ -11,7 +11,6 @@ load(
 go_library(
     name = "go_default_library",
     srcs = [
-        "consistentread.go",
         "io.go",
         "writer.go",
     ],
