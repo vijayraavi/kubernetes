@@ -39,9 +39,8 @@ import (
 )
 
 const (
-	defaultFSType                   = "ext4"
-	defaultStorageAccountType       = storage.StandardLRS
-	defaultAzureDataDiskCachingMode = v1.AzureDataDiskCachingNone
+	defaultFSType             = "ext4"
+	defaultStorageAccountType = storage.StandardLRS
 )
 
 type dataDisk struct {
@@ -145,7 +144,7 @@ func normalizeStorageAccountType(storageAccountType string) (storage.SkuName, er
 
 func normalizeCachingMode(cachingMode v1.AzureDataDiskCachingMode) (v1.AzureDataDiskCachingMode, error) {
 	if cachingMode == "" {
-		return defaultAzureDataDiskCachingMode, nil
+		return v1.AzureDataDiskCachingReadWrite, nil
 	}
 
 	if !supportedCachingModes.Has(string(cachingMode)) {
