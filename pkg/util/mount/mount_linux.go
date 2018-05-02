@@ -56,9 +56,7 @@ const (
 	// place for subpath mounts
 	containerSubPathDirectoryName = "volume-subpaths"
 	// syscall.Openat flags used to traverse directories not following symlinks
-	nofollowFlags = unix.O_RDONLY | unix.O_NOFOLLOW
-	// flags for getting file descriptor without following the symlink
-	openFDFlags = unix.O_NOFOLLOW | unix.O_PATH
+	nofollowFlags = syscall.O_RDONLY | syscall.O_NOFOLLOW
 )
 
 // Mounter provides the default implementation of mount.Interface
@@ -992,9 +990,7 @@ func findExistingPrefix(base, pathname string) (string, []string, error) {
 		}
 	}()
 	for i, dir := range dirs {
-		// Using O_PATH here will prevent hangs in case user replaces directory with
-		// fifo
-		childFD, err := syscall.Openat(fd, dir, unix.O_PATH, 0)
+		childFD, err := syscall.Openat(fd, dir, syscall.O_RDONLY, 0)
 		if err != nil {
 			if os.IsNotExist(err) {
 				return currentPath, dirs[i:], nil
@@ -1056,19 +1052,9 @@ func doSafeOpen(pathname string, base string) (int, error) {
 		}
 
 		glog.V(5).Infof("Opening path %s", currentPath)
-		childFD, err = syscall.Openat(parentFD, seg, openFDFlags, 0)
+		childFD, err = syscall.Openat(parentFD, seg, nofollowFlags, 0)
 		if err != nil {
 			return -1, fmt.Errorf("cannot open %s: %s", currentPath, err)
-		}
-
-		var deviceStat unix.Stat_t
-		err := unix.Fstat(childFD, &deviceStat)
-		if err != nil {
-			return -1, fmt.Errorf("Error running fstat on %s with %v", currentPath, err)
-		}
-		fileFmt := deviceStat.Mode & syscall.S_IFMT
-		if fileFmt == syscall.S_IFLNK {
-			return -1, fmt.Errorf("Unexpected symlink found %s", currentPath)
 		}
 
 		// Close parentFD
